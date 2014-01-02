@@ -33,30 +33,25 @@ $(function () {
         jsonReader: { repeatitems: false },
         sortorder: "asc",
         sortname: "No",//传递给服务端的排序字段名
-        subGrid: true,//开启子表格--------------------------------------------------------------------------------
-        subGridRowExpanded: function(subgrid_id, row_id) {  // (2)子表格容器的id和需要展开子表格的行id，将传入此事件函数  
-            var subgrid_table_id;  
-            subgrid_table_id = subgrid_id + "_t";   // (3)根据subgrid_id定义对应的子表格的table的id  
+        subGrid: true,//开启子表格-------------------------------------------------------------------
+        subGridRowExpanded: function(subgrid_id, row_id) {  //子表格容器的id和需要展开子表格的行id（行索引）  
+            var subgrid_table_id = subgrid_id + "_t";   //根据subgrid_id定义对应的子表格的table的id               
+            var subgrid_pager_id = subgrid_id + "_pgr"  //根据subgrid_id定义对应的子表格的pager的id  
               
-            var subgrid_pager_id;  
-            subgrid_pager_id = subgrid_id + "_pgr"  // (4)根据subgrid_id定义对应的子表格的pager的id  
-              
-            // (5)动态添加子报表的table和pager  
-            $("#" + subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_pager_id+"' class='scroll'></div>");  
-              
-            // (6)创建jqGrid对象  
+            //动态添加子报表的table和pager  
+            $("#" + subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_pager_id+"' class='scroll'></div>");               
+            //获得要传递的值
+            var memberId = $("#grid").jqGrid("getRowData", row_id).No;//row_id是父表格选中行的索引
+            //创建jqGrid对象  
             $("#" + subgrid_table_id).jqGrid({  
-                url: "/Home/GetSubGridData?Members.No=" + row_id,  // (7)子表格数据对应的url，注意传入的contact.id参数  
-                //url: "/Home/GetSubGridData",  // (7)子表格数据对应的url，注意传入的contact.id参数  
+                url: "/Home/GetSubGridData?MemberId=" + memberId,  //子表格数据对应的url，注意传入的MemberId参数在Controller里用Request.QueryString["MemberId"]来接收!  
                 datatype: "json",  
-                colNames: ['编号', 'Message', 'CreatedOn', 'Members_No'],
                 colModel: [  
-                    {name:"No",index:"No",width:80,key:true},  
-                    { name: "Message", index: "Message", width: 130 },
-                    { name: "CreatedOn", index: "CreatedOn", width: 80, align: "right" },
-                    { name: "Members.No", index: "Members.No", width: 80, align: "right" }
+                    { label: 'Guestbook No.',name:"No",index:"No",width:80,key:true},  
+                    { label: 'Message', name: "Message", index: "Message", width: 130 },
+                    { label: 'Created On', name: "CreatedOn", index: "CreatedOn", formatter: 'date', formatoptions: { srcformat: 'Y-m-d H:i:s', newformat: 'Y-m-d H:i:s' } }
                 ],  
-                jsonReader: {   // (8)针对子表格的jsonReader设置   
+                jsonReader: {   //针对子表格的jsonReader设置   
                     repeatitems : false  
                 },  
                 pager: subgrid_pager_id,  
@@ -65,9 +60,9 @@ $(function () {
                 rowNum: 5,
                 sortorder: "asc",
                 sortname: "No",//传递给服务端的排序字段名
-            });  
-        }  
-    });  
+            });  //end subGrid  
+        }   // end subGridRowExpanded-------------------------------------------------------------
+    });  //end jqGrid
 });
 </script>
 

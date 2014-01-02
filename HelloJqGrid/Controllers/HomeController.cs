@@ -218,13 +218,13 @@ namespace HelloJqGrid.Controllers
         {
             return View();
         }
-        public ActionResult GetSubGridData(GridSettings grid,string id)
+        public ActionResult GetSubGridData(GridSettings grid)
         {
             MyContext db = new MyContext();
             var query = db.Guestbooks as IQueryable<Guestbook>;
-            var i =Convert.ToInt32(Request.QueryString["Members.No"]);
+            var id =Convert.ToInt32(Request.QueryString["MemberId"]);
             query = from g in query
-                        where g.Members.No ==i
+                        where g.Members.No ==id
                         select g;
             return GridSearchHelper.GetQuery(grid, query);
         }
