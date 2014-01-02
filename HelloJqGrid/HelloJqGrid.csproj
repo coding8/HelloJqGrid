@@ -312,6 +312,7 @@
     <Content Include="Views\Home\CRUD.cshtml" />
     <Content Include="Views\Home\SingleSearch.cshtml" />
     <Content Include="Views\Home\MultipleSearch.cshtml" />
+    <Content Include="Views\Home\SubGrid.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

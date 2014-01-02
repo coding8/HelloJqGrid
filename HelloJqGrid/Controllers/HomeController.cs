@@ -212,5 +212,21 @@ namespace HelloJqGrid.Controllers
         {
             return View();
         }
+
+        //subGrid
+        public ActionResult SubGrid()
+        {
+            return View();
+        }
+        public ActionResult GetSubGridData(GridSettings grid,string id)
+        {
+            MyContext db = new MyContext();
+            var query = db.Guestbooks as IQueryable<Guestbook>;
+            var i =Convert.ToInt32(Request.QueryString["Members.No"]);
+            query = from g in query
+                        where g.Members.No ==i
+                        select g;
+            return GridSearchHelper.GetQuery(grid, query);
+        }
     }
 }
