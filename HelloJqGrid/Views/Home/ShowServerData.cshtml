@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "ShowServerData";
+}
+
+<h2>ShowServerData</h2>
+<script type="text/javascript">
+    $(function () {
+        jQuery("#grid").jqGrid({
+            url: "/Home/GetServerData",
+            datatype: "json",           
+            mtype:"get",
+            //colNames: ['No', 'Name', 'Client'],
+            colModel: [
+                {label:'Number', name: 'No', index: 'No', width: 60, sorttype: "int" },
+                {label:'Name', name: 'Name', index: 'invdateName', width: 90 },
+                {label:'Email', name: 'Email', index: 'Email', width: 100 },
+                {label:'Created On', name: 'CreatedOn', index: 'CreatedOn', width: 100 }
+            ],
+            caption: "jqGrid data",
+            rowNum: 5,
+            pager: "pager",
+            viewrecords: true,
+            width: 500, height: "auto",
+            jsonReader:{repeatitems: false}
+        });
+    });
+</script>
+
+<table id="grid"></table>
+<div id="pager"></div>

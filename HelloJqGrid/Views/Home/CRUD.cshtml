@@ -1,0 +1,39 @@
+﻿@model HelloJqGrid.Models.Member
+
+@{
+    ViewBag.Title = "CRUD";
+}
+<script type="text/javascript" src="~/ViewJs/CRUD.js"></script>
+
+<h2>CRUD</h2>
+
+<button onclick="openDialog('添加')">添加</button>
+<button onclick="openDialog('删除')">删除</button>
+<button onclick="openDialog('更改')">更改</button>
+
+<table id="grid"></table>
+<div id="pager"></div>
+
+<div id="myDialog">
+    <form id="myForm">
+    <div>
+        <label>Your name:</label>
+        @Html.EditorFor(model => model.Name)
+        @Html.ValidationMessageFor(model => model.Name)
+    </div>
+
+    <div>
+        <label>Your email:</label>
+        @Html.EditorFor(model => model.Email)
+        @Html.ValidationMessageFor(model => model.Email)
+    </div>
+
+    <div>
+        <label>Birthday:</label>
+        @Html.EditorFor(model => model.Birthday)
+        @Html.ValidationMessageFor(model => model.Birthday)
+    </div>
+    </form>
+</div>
+@section Scripts{@Scripts.Render("~/bundles/jqueryval")}
+

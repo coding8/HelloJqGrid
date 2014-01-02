@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "GetDataFromLocal";
+}
+
+<h2>GetDataFromLocal</h2>
+
+<script type="text/javascript">
+    $(function () {
+        jQuery("#grid").jqGrid({
+            url: "/Home/GetLocalData",
+            datatype: "json",           
+            mtype:"get",
+            colNames: ['Inv No', 'Date', 'Client'],
+            colModel: [
+                { name: 'id', index: 'id', width: 60, sorttype: "int" },
+                { name: 'invdate', index: 'invdate', width: 90, sorttype: "date" },
+                { name: 'name', index: 'name', width: 100 }
+            ],
+            caption: "jqGrid data",
+            rowNum: 5,
+            pager: "pager",
+            viewrecords: true,
+            width: 300, height: "auto",
+            jsonReader:{repeatitems: false}
+        });
+    });
+</script>
+
+<table id="grid"></table>
+<div id="pager"></div>

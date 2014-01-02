@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "SingleSearch";
+}
+<script src="~/ViewJs/SingleSearch.js"></script>
+<h2>SingleSearch</h2>
+
+    <select id="searchField" name="searchField">
+        <option value="Name">Name</option>
+        <option value="Email">email</option>
+    </select>
+    <select id="searchOper" name="searchOper">
+         <option value="eq">等于</option>
+         <option value="cn">包含</option>
+    </select>
+    <input type="text" id="searchString" name="searchString" />
+    <button onclick="singleSearch()">search</button>
+    <button onclick="clearSearch()">重置搜索条件</button>
+
+<table id="grid"></table>
+<div id="pager"></div>

@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "ShowSorting";
+}
+
+<h2>ShowSorting</h2>
+<script type="text/javascript">
+    $(function () {
+        jQuery("#grid").jqGrid({
+            url: "/Home/GetSortingData",
+            datatype: "json",           
+            mtype:"get",
+            colModel: [
+                {label:'Number', name: 'No', index: 'No', width: 60, sorttype: "int" },
+                {label:'Name', name: 'Name', index: 'Name', width: 90 },
+                {label:'Email', name: 'Email', index: 'Email', width: 100,sortable:false},
+                {
+                    label: 'Created On', name: 'CreatedOn', index: 'CreatedOn', width: 150,
+                    formatter: 'date', formatoptions: { srcformat: 'Y-m-d H:i:s',newformat:'Y-m-d H:i:s' }
+                }
+            ],
+            caption: "jqGrid data",
+            //loadonce: true,     //把服务端的数据都加载到页面。datatype会自动设置为local，所有的操作都在客户端完成。
+            loadonce: false,    //排序翻页等操作在服务端完成
+            rowNum: 5,        //大于等于总记录数
+            rowList:[5,10,20],  //设置分页下拉列表
+            pager: "pager",
+            viewrecords: true,
+            width: 500, height: "auto",
+            jsonReader: { repeatitems: false}, //prmNames: { id: "No" },
+            sortorder: "asc",
+            sortname: "No"//传递给服务端的排序字段名
+        });
+    });
+</script>
+
+<table id="grid"></table>
+<div id="pager"></div>

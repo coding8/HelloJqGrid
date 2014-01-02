@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "MultipleSearch";
+}
+<script src="~/ViewJs/MultipleSearch.js"></script>
+<h2>MultipleSearch</h2>
+<div id="multipleSearch">
+    <table class="formTable">
+        <thead>
+            <tr>
+                <th>查询条件</th>
+                <th>查询方式</th>
+                <th>查询值</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <select class="searchField">
+                        <option value="Name">Name</option>
+                        <option value="Email">Your Email</option>
+                        <option value="Birthday">Birthday</option>
+                        <option value="Age">age</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="searchOper">
+                        <option value="eq">等于</option>
+                        <option value="cn">包含</option>
+                        <option value="gt">大于</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="searchString" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <select class="searchField">
+                        <option value="Name">Name</option>
+                        <option value="Email">Your Email</option>
+                        <option value="Birthday">Birthday</option>
+                        <option value="Age">age</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="searchOper">
+                        <option value="eq">等于</option>
+                        <option value="cn">包含</option>
+                        <option value="lt">小于</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="searchString" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button onclick="multipleSearch()">search</button>
+    <button onclick="clearSearch()">清空搜索条件</button>
+</div>
+
+<table id="grid"></table>
+<div id="pager"></div>
