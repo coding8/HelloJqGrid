@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "MasterDetail";
+}
+
+<h2>MasterDetail</h2>
+<script type="text/javascript">
+    $(function () {
+        //配置jqGrid
+        $("#grid").jqGrid({
+            url: "/Home/GetSearchData",
+            datatype: "json",
+            mtype: "get",
+            colModel: [
+                { label: 'Number', name: 'No', index: 'No', width: 60, sorttype: "int" },
+                { label: 'Name', name: 'Name', index: 'Name', width: 90 },
+                { label: 'Email', name: 'Email', index: 'Email', width: 100, sortable: false },
+                { label: 'Age', name: 'Age', index: 'Age' },
+                {
+                    label: 'Birthday', name: 'Birthday', index: 'Birthday', width: 100,
+                    formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'Y-m-d' },
+                    editable: true, editrules: { required: true }
+                },
+                {
+                    label: 'Created On', name: 'CreatedOn', index: 'CreatedOn', width: 150,
+                    formatter: 'date', formatoptions: { srcformat: 'Y-m-d H:i:s', newformat: 'Y-m-d H:i:s' }
+                }
+            ],
+            caption: "jqGrid Master",
+            loadonce: false,    //排序翻页等操作在服务端完成
+            rowNum: 5,
+            rowList: [5, 10, 20],  //设置分页下拉列表
+            pager: "#pager",
+            viewrecords: true,
+            width: 500, height: "auto",
+            jsonReader: { repeatitems: false },
+            sortorder: "asc",
+            sortname: "No",//传递给服务端的排序字段名
+            onSelectRow: function (ids) {
+                if (ids != null) {
+                    var data = $("#grid").getRowData(ids);
+                    jQuery("#detail").setGridParam({ url: "/Home/GetDetailGridData/" + data.No, page: 1 })
+                   .setCaption("<b> Details for : " + data.Name + "</b>")
+                   .trigger('reloadGrid');
+                }
+            }
+        });
+
+        //detailGrid  
+        $("#detail").jqGrid({
+            datatype: "json",
+            colModel: [
+                { label: 'Guestbook No.', name: "No", index: "No", width: 80, key: true },
+                { label: 'Message', name: "Message", index: "Message", width: 130 },
+                { label: 'Created On', name: "CreatedOn", index: "CreatedOn", formatter: 'date', formatoptions: { srcformat: 'Y-m-d H:i:s', newformat: 'Y-m-d H:i:s' } }
+            ],
+            jsonReader: {   
+                repeatitems: false
+            },
+            pager: "#detailPager",
+            viewrecords: true,
+            height: "100%",
+            rowNum: 5,
+            sortorder: "asc",
+            sortname: "No"
+        });  //end detailGrid
+    });
+</script>
+<table id="grid"></table>
+<div id="pager"></div>
+<table id="detail"></table>
+<div id="detailPager"></div>

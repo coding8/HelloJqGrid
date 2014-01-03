@@ -6,6 +6,9 @@ using HelloJqGrid.Models;
 using HelloJqGrid.ViewModel;
 using System.Linq.Dynamic;
 using MvcJqGrid;
+using System.Data;
+using System.Data.Objects;
+
 namespace HelloJqGrid.Controllers
 {
     public class HomeController : Controller
@@ -164,14 +167,19 @@ namespace HelloJqGrid.Controllers
         public ActionResult Update(Member m)
         {
             MyContext db = new MyContext();
-            Member member = db.Members.First(mb => mb.No == m.No);
+            //Member member = db.Members.First(mb => mb.No == m.No);
+                      
+            //member.Name = m.Name.Trim();
+            //member.Email = m.Email;
+            //member.Birthday = m.Birthday;
+            //member.CreatedOn = m.CreatedOn;
+            //db.SaveChanges();
 
-            member.Name = m.Name.Trim();
-            member.Email = m.Email;
-            member.Birthday = m.Birthday;
-            member.CreatedOn = m.CreatedOn;
-
+            Member member = db.Members.Find(m.No);//Find查找主键
+            //只更新修改的属性
+            db.Entry(member).CurrentValues.SetValues(m);
             db.SaveChanges();
+
             return Json(new { msg = "success" });
         }
         //为客户端选中行提供数据
@@ -226,6 +234,22 @@ namespace HelloJqGrid.Controllers
             query = from g in query
                         where g.Members.No ==id
                         select g;
+            return GridSearchHelper.GetQuery(grid, query);
+        }
+
+        //MasterDetail
+        public ActionResult MasterDetail()
+        {
+            return View();
+        }
+        public ActionResult GetDetailGridData(GridSettings grid, int id=0)
+        {
+            MyContext db = new MyContext();
+            var query = db.Guestbooks as IQueryable<Guestbook>;
+            query = from g in query
+                    where g.Members.No == id
+                    select g;
+
             return GridSearchHelper.GetQuery(grid, query);
         }
     }
