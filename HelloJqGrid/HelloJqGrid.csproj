@@ -138,6 +138,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AuditTrailFactory.cs" />
     <Compile Include="Models\MvcJqGrid.cs" />
     <Compile Include="Models\MyContext.cs" />
     <Compile Include="Models\MyEntity.cs" />

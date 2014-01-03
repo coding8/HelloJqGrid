@@ -20,6 +20,7 @@ namespace HelloJqGrid.Models
         public Member Members { get; set; }
     }
 
+    [Table("Member")]
     public class Member
     {
         [Key]
@@ -43,4 +44,17 @@ namespace HelloJqGrid.Models
         public ICollection<Guestbook> Guestbooks { get; set; }
 
     }
+
+    [Table("Audit")]
+    public class Audit
+    {
+        public long Id { get; set; }
+        public string TableName { get; set; }
+        public string UserId { get; set; }
+        public string Actions { get; set; }
+        public string OldData { get; set; }
+        public string NewData { get; set; }
+        public Nullable<long> TableIdValue { get; set; }
+        public Nullable<System.DateTime> UpdateDate { get; set; }
+    }  
 }
