@@ -6,8 +6,9 @@ using HelloJqGrid.Models;
 using HelloJqGrid.ViewModel;
 using System.Linq.Dynamic;
 using MvcJqGrid;
-using System.Data;
-using System.Data.Objects;
+using System.Collections.Generic;
+using System.Web;
+using System.IO;
 
 namespace HelloJqGrid.Controllers
 {
@@ -251,6 +252,24 @@ namespace HelloJqGrid.Controllers
                     select g;
 
             return GridSearchHelper.GetQuery(grid, query);
+        }
+
+        //上传文件
+        [HttpGet]
+        public ActionResult UploadFile() { return View(); }
+        [HttpPost]
+        public ActionResult UploadFile(IEnumerable<HttpPostedFileBase> uploadfile)//TODO:加入判断及错误捕捉
+        {
+            foreach (var file in uploadfile)
+            {
+                if (file != null && file.ContentLength > 0)
+                {
+                    var fileName = Path.GetFileName(file.FileName);
+                    var path = Path.Combine(Server.MapPath("~/Uploads"), fileName);
+                    file.SaveAs(path);
+                }
+            }
+            return RedirectToAction("UploadFile");
         }
     }
 }

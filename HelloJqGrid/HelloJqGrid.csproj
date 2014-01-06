@@ -315,9 +315,11 @@
     <Content Include="Views\Home\MultipleSearch.cshtml" />
     <Content Include="Views\Home\SubGrid.cshtml" />
     <Content Include="Views\Home\MasterDetail.cshtml" />
+    <Content Include="Views\Home\UploadFile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Uploads\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

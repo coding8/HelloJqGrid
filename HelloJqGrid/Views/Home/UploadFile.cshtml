@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "upload";
+}
+
+<h2>upload</h2>
+<script type="text/javascript">
+    $(function () {
+        //清除文件文本框的内容 http://www.campusmvp.net/blog/clearing-a-typefile-input            
+        $("input[type=file]").after(
+            " <a href='#' class='clear-inputfile'>清除内容</a>" + " | " +
+            " <a href='#' class='removeInputFile'>取消</a>    " + " | " +
+            " <a href='#' class='addInputFile'>增加</a>"
+            );
+        $(".clear-inputfile").click(function () {
+            var input = $(this).prev("input[type=file]");
+            var clone = input.clone();
+            clone.val(null);//解决firefox里清除无效                
+            input.replaceWith(clone);
+            return false;
+        });
+        //添加 （复制当前行）          
+        $('.addInputFile').click(function () {
+            var clone = $(this).parent().clone(true);//true:连事件一起复制
+            var file = clone.children("input[type=file]").val(null);
+            $(clone).insertAfter($(this).parent());
+        });
+        //删除            
+        $('.removeInputFile').click(function () {
+            var num = $('#upload input[type=file]').length;
+            if (num == 1) {
+                alert('必须保留一个！');
+                return false;
+            }
+            $(this.parentElement).remove();
+        });
+    });
+</script>
+
+<h2>Upload Files</h2>
+<form action="/Home/UploadFile" method="post" enctype="multipart/form-data">
+    <div id="upload">
+        <input type="file" name="uploadfile" style="border: 1px solid gray;" />
+    </div>
+    <input type="submit" value="上传" />
+</form>
