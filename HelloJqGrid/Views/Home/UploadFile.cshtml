@@ -2,7 +2,7 @@
     ViewBag.Title = "upload";
 }
 
-<h2>upload</h2>
+<script src="~/Scripts/jquery.form.min.js"></script>
 <script type="text/javascript">
     $(function () {
         //清除文件文本框的内容 http://www.campusmvp.net/blog/clearing-a-typefile-input            
@@ -33,13 +33,37 @@
             }
             $(this.parentElement).remove();
         });
-    });
+        // 上传文件表单
+        $("#uploadform").ajaxForm({
+            iframe: true,
+            dataType: "json",
+            beforeSubmit: function (formData) {//formData is an array of objects representing the name and value of each field that will be sent to the server;
+                for (var i = 0; i < formData.length; i++) {
+                    if (!formData[i].value) {
+                        alert('请选择文件！');
+                        return false;
+                    }
+                }
+            },
+            success: function (responseText) {
+                $("#uploadform").resetForm();
+                var DialogVars = $.parseJSON(result);//响应信息
+                $('#msg').text(responseText.fileName + ": " + responseText.message);
+                alert(responseText.message);
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#uploadform").resetForm();
+                alert('文档上传错误.');
+            }
+        });//end ajaxForm
+    });//end $(function(){})
 </script>
 
 <h2>Upload Files</h2>
-<form action="/Home/UploadFile" method="post" enctype="multipart/form-data">
-    <div id="upload">
-        <input type="file" name="uploadfile" style="border: 1px solid gray;" />
-    </div>
-    <input type="submit" value="上传" />
+<form id="uploadform" action="/Home/UploadFile" method="post" enctype="multipart/form-data">
+<div id="upload">
+    <input type="file" name="uploadfile" style="border: 1px solid gray;" />
+</div>
+<input type="submit" value="上传" />
 </form>
+<label id="msg"></label>
