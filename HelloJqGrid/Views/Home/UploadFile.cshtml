@@ -47,7 +47,7 @@
             },
             success: function (responseText) {
                 $("#uploadform").resetForm();
-                var DialogVars = $.parseJSON(result);//响应信息
+                //var DialogVars = $.parseJSON(result);//响应信息
                 $('#msg').text(responseText.fileName + ": " + responseText.message);
                 alert(responseText.message);
             },
@@ -67,3 +67,22 @@
 <input type="submit" value="上传" />
 </form>
 <label id="msg"></label>
+
+<!--Ajax.BeginForm也要配合jquery.form.plugin一起使用-->
+@*@using (Ajax.BeginForm(
+                        "UploadFile", 
+                        "Home",
+                        new AjaxOptions
+                        {
+                            UpdateTargetId = "msg",
+                            HttpMethod = "Post"
+                        }, 
+                        new { enctype = "multipart/form-data" }
+                        )
+        )
+{
+    <div id="upload">
+        <input type="file" name="uploadfile" style="border: 1px solid gray;" />
+    </div>
+    <input type="submit" value="上传" />
+}*@

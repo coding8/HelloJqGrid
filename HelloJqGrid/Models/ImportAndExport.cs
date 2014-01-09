@@ -58,7 +58,6 @@ namespace HelloJqGrid.Models
                             throw;
                         }
                     }
-                    //BatchCopy(excelReader, dbTableName, columnMapping);//复制数据
                     excelConnection.Close();//关闭连接
                 }
             }

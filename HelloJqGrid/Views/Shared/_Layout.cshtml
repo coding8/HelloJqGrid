@@ -11,7 +11,7 @@
     @Scripts.Render("~/bundles/jqueryui")
     @Scripts.Render("~/bundles/jqueryjqgrid")
     @Scripts.Render("~/bundles/datepicker")
-     @*@Scripts.Render("~/bundles/jqueryval")*@ <!--数据验证可以放在需要的页面-->
+    @Scripts.Render("~/bundles/jqueryval")<!--要想在布局页里使用以下脚本，必须加入验证文件，否则会有：SCRIPT5007: 无法获取属性“methods”的值: 对象为 null 或未定义 -->
 
     <!--
         jquery.validate.js中的日期判断这句有误：
