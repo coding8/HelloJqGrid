@@ -149,6 +149,7 @@
     <Compile Include="ViewModel\JqGridViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\ajax-loader.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -298,6 +299,11 @@
     <Content Include="Scripts\knockout-2.2.0.debug.js" />
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\Uploadify\jquery.uploadify.js" />
+    <Content Include="Scripts\Uploadify\jquery.uploadify.min.js" />
+    <Content Include="Scripts\Uploadify\uploadify-cancel.png" />
+    <Content Include="Scripts\Uploadify\uploadify.css" />
+    <Content Include="Scripts\Uploadify\uploadify.swf" />
     <Content Include="Scripts\_references.js" />
     <Content Include="ViewJs\CRUD.js" />
     <Content Include="ViewJs\MultipleSearch.js" />
@@ -327,6 +333,8 @@
     <Content Include="Views\Home\MasterDetail.cshtml" />
     <Content Include="Views\Home\UploadFile.cshtml" />
     <Content Include="Views\FineUploader\Index.cshtml" />
+    <Content Include="Views\Uploadify\Index.cshtml" />
+    <Content Include="UploadTemplate\Member.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -61,11 +61,30 @@ namespace Helper
             }
         }
 
+        ///<summary>导出到Excel</summary>
+        ///<param name="ctrl">包含数据的控件</param>
+        ///<param name="fileName">文件名</param>
+        public static void ExportToExcel(WebControl ctrl, string fileName)
+        {
+            HttpContext.Current.Response.Clear();
+            HttpContext.Current.Response.ContentType = "application/ms-excel";
+            HttpContext.Current.Response.Charset = "UTF-8";
+            HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.UTF8;
+            //HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment;filename=" + "" + fileName + ".xls");
+            HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment;filename=" + System.Web.HttpUtility.UrlEncode(fileName, System.Text.Encoding.UTF8) + ".xls");//这样的话，可以设置文件名为中文，且文件名不会乱码。其实就是将汉字转换成UTF8
+            HttpContext.Current.Response.BinaryWrite(System.Text.Encoding.UTF8.GetPreamble());
+
+            StringWriter sw = new System.IO.StringWriter();
+            System.Web.UI.HtmlTextWriter htw = new System.Web.UI.HtmlTextWriter(sw);
+            ctrl.RenderControl(htw);
+            HttpContext.Current.Response.Write(sw.ToString());
+            HttpContext.Current.Response.End();
+        }
+
         ///<summary>复制数据-不带事务的</summary>
         /// <param name="dt">源数据</param>
         /// <param name="tbName">目标数据表名称</param>
         ///<param name="columnMapping">完整的字段映射</param>
-
         public static void BatchCopy0(DataTable dt, string tbName, List<string> columnMapping)
         {
             using (SqlBulkCopy sbc = new SqlBulkCopy(sqlConnectionString, SqlBulkCopyOptions.KeepNulls))
@@ -89,26 +108,6 @@ namespace Helper
                     throw ex;
                 }
             }
-        }
-
-        ///<summary>导出到Excel</summary>
-        ///<param name="ctrl">包含数据的控件</param>
-        ///<param name="fileName">文件名</param>
-        public static void ExportToExcel(WebControl ctrl, string fileName)
-        {
-            HttpContext.Current.Response.Clear();
-            HttpContext.Current.Response.ContentType = "application/ms-excel";
-            HttpContext.Current.Response.Charset = "UTF-8";
-            HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.UTF8;
-            //HttpContext.Current.Response.AppendHeader("Content-Disposition", "attachment;filename=" + "" + fileName + ".xls");
-            HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment;filename=" + System.Web.HttpUtility.UrlEncode(fileName, System.Text.Encoding.UTF8) + ".xls");//这样的话，可以设置文件名为中文，且文件名不会乱码。其实就是将汉字转换成UTF8
-            HttpContext.Current.Response.BinaryWrite(System.Text.Encoding.UTF8.GetPreamble());
-
-            StringWriter sw = new System.IO.StringWriter();
-            System.Web.UI.HtmlTextWriter htw = new System.Web.UI.HtmlTextWriter(sw);
-            ctrl.RenderControl(htw);
-            HttpContext.Current.Response.Write(sw.ToString());
-            HttpContext.Current.Response.End();
         }
 
         /// <summary>复制数据-带事务</summary>
@@ -175,7 +174,7 @@ namespace Helper
                         columnMapping.Add("年龄,Age");
                         break;
                     case "COOIS":
-                       //do sth.
+                        //do sth.
                         break;
                     default:
                         break;
@@ -184,6 +183,64 @@ namespace Helper
                 columnMapping.Add("CreatedBy,CreatedBy");
                 columnMapping.Add("CreatedOn,CreatedOn");
             }
+        }
+
+        ///<summary>循环上传文件写入数据库</summary>
+        ///<param name="server">Web服务器</param>
+        ///<returns name="str">上传文件名及上传情况</returns>
+        public static string BatchUpload(HttpServerUtilityBase server)
+        {
+            var folder = server.MapPath("~/Uploads");
+            var tbName = "";
+            string[] files = Directory.GetFiles(folder);
+
+            string str = "";
+            if (files.Length != 0)
+            {
+                foreach (var file in files)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file);
+                    var columnMapping = new List<string>();
+                    switch (fileName)
+                    {
+                        case "Member":
+                            tbName = "Member";
+                            columnMapping.Add("姓名,Name");
+                            columnMapping.Add("邮箱,Email");
+                            columnMapping.Add("生日,Birthday");
+                            columnMapping.Add("年龄,Age");
+                            break;
+                        case "COOIS":
+                            //do sth.
+                            break;
+                        default:
+                            break;
+                    }
+                    try
+                    {
+                        ////以下字段未在Excel表格中出现，需传给SqlBulkCopy。
+                        columnMapping.Add("CreatedBy,CreatedBy");
+                        columnMapping.Add("CreatedOn,CreatedOn");
+
+                        ImportAndExport.ImportExcel(file, tbName, columnMapping);
+                        System.IO.File.Delete(file);//文件正由另一进程使用，因此该进程无法访问此文件。
+                        str += "<p style='background-color:#5DA30C'>写入成功: " + fileName + "</p>";
+
+                        //想使用ViewBag或ViewData有问题，似乎和ajax有关：
+                        //If you are making an ajax post to the controller action Refresh() and returning Json data, 
+                        //the page does not reload and the ViewBag is not opened.  
+                        //If you post the page and return a view, then you will probably get the result you want.  
+                        //If you want to do it with ajax, then send the boolean with the json, open it on the client in the ajax success callback and use jquery to show/hide the part of the page you want.
+                        //http://forums.asp.net/t/1848093.aspx
+                    }
+                    catch (Exception ex)
+                    {
+                        System.IO.File.Delete(file);
+                        str += "<p style='background-color:orange'>写入失败: " + fileName + " [" + ex.Message + "]</p>";
+                    }
+                }
+            }
+            return str;
         }
     }
 }

@@ -1,0 +1,145 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Uploadify</title>
+    <script src="~/Scripts/jquery-1.8.3.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/Uploadify/jquery.uploadify.min.js" type="text/javascript"></script>
+    <link href="~/Scripts/Uploadify/uploadify.css" rel="stylesheet" />
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#myUploadFile").uploadify({
+                //属性
+                'auto': false, //不自动上传
+                'height': 30, //按钮的高度
+                'width': 80, //按钮的宽度
+                //'swf': '../Scripts/Uploadify/uploadify.swf', //必输入！flash.注意路径！！
+                'fileObjName': 'uploadfile', //传递给后台程序的参数, 否则会接收不到！
+                'swf': '@Url.Content("~/Scripts/Uploadify/uploadify.swf")',
+                'uploader': '@Url.Action("Uploadify")', //后台处理程序. 注意路径！！
+                //'uploader': '../Home/Uploadify', //后台处理程序. 注意路径！！
+                'queueID': 'queue', //显示上传队列的容器
+                'buttonText': '选择文件', //按钮显示文字
+                //'fileSizeLimit': '5MB',
+                //'queueSizeLimit': 5, //同时允许上传5个文件
+                'fileTypeExts': '*.xls;*.xlsx',
+                'removeCompleted': false, //上传后保持队列不消失
+                'requeueErrors': true,
+                //事件
+                'onSelect': function (file)//从浏览窗口中选择文件
+                {
+                    if (file.size / 1024 / 1024 > 10) //文件10M
+                    {
+                        alert('文件过大，请分批上传！');
+                        $('#myUploadFile').uploadify('cancel', file.id); //cancel方法可以带上file的id作为参数，指定取消该项。
+                    }
+                    $('#msg').text('');
+                },
+                'onCancel': function (file)//从队列中取消文件 
+                {
+                    //alert('文件： ' + file.name + ' 被取消.');
+                },
+                'onClearQueue': function (queueItemCount) {//只在未上传前有效，上传后其实还保存在队列中。
+                    //alert(queueItemCount + ' file(s) were removed from the queue');
+                },
+                'onDialogClose': function (queueData) //当浏览窗口关闭时
+                {
+                    //alert(queueData.filesQueued + ' files were queued of ' + queueData.filesSelected + ' selected files. There are ' + queueData.queueLength + ' total files in the queue.');
+                },
+                'onQueueComplete': function (queueData)//全部上传完毕后触发
+                {
+                    //alert(queueData.uploadsSuccessful + ' 个文件成功上传。');
+                    toDatabase();//写入数据库 
+                    $('.progress').show();//显示进度动画
+                },
+                'onUploadError': function (file, errorCode, errorMsg, errorString) {
+                    //alert('The file ' + file.name + ' 上传失败: ' + errorString);
+                    //alert('errorCode:'+errorCode);
+                    //alert('errormsg:' + errorMsg);//500
+                    //alert('errorString:' + errorString);//HTTP Error (500)
+                },
+                'onUploadSuccess': function (file, data, response) {//每个文件上传成功时触发该事件
+                    //alert('The file ' + file.name + ' 上传成功！');
+                    //alert('response is :' + response); //response is true
+                },
+                'onSelectError': function (file, errorCode, errorMsg) //错误信息
+                {
+                    switch (errorCode) {
+                        case -100:
+                            alert("上传的文件数量已超过系统限制的" + $('#myUploadFile').uploadify('settings', 'queueSizeLimit') + "个文件");
+                            break;
+                        case -110:
+                            alert("文件(" + file.name + ")大小超出系统限制的" + $('#myUploadFile').uploadify('settings', 'fileSizeLimit') + "大小！");
+                            break;
+                        case -120:
+                            alert("文件(" + file.name + ")大小异常！");
+                            break;
+                        case -130:
+                            alert("文件(" + file.name + ")类型不正确！");
+                            break;
+                    }
+                }
+            });
+        });//end $(document).ready
+
+        //上传前判断是否有文件
+        function checkFile() {
+            var queueCount = $("#queue > div").size();//通过还剩几个div来判断有几个文件
+
+            if (queueCount == 0) {
+                alert('请先选择文件！');
+                return false;
+            }
+        }
+        //写入数据库
+        function toDatabase() {
+            $.get(
+                "/Uploadify/WriteExcelToDatabase" + "?time=" + new Date().getTime(),//解决IE ajax缓存问题，FF不存在该问题。
+                function (data, state) {
+                    //data:显示从服务器返回的数据;state:显示返回的状态
+                    $('#msg').html(data);//显示上传结果（是个字符串） 
+                    $('.progress').hide();//隐藏进度动画
+                });
+            //必须移除文件，否则会提示已存在:The file named "xx.xlsx" is already in the queue.
+            //Do you want to replace the existing item in the queue?
+            var files = $('#myUploadFile').data('uploadify').queueData.files;
+            for (var member in files) delete files[member];
+            $('#myUploadFile').uploadify('cancel', '*');
+
+            //要有个延迟，不然出不来。但是这个时间不好掌握！！还是写在后台保险！
+            //setTimeout(function () {
+            //    $("li:contains('失败')").css("background-color", "orange");
+            //    $("li:contains('成功')").css("background-color", "#0AC227");
+            //}, 1000);    
+        }
+
+        //注意！$('#myUploadFile').uploadify('cancel','*')只会在上传前移除队列文件。如果已经上传则需要delete file
+        function clearQueueAfterUpload() {
+            var files = $('#myUploadFile').data('uploadify').queueData.files;
+            for (var member in files) delete files[member];
+            $('#myUploadFile').uploadify('cancel', '*');
+            //$('#myUploadFile').uploadify('settings', 'onCancel', 'member');//不知道更改setting能否实现？
+        }
+    </script>
+</head>
+<body>
+    <input type="file" id="myUploadFile" />
+    <p style="line-height: 30px; height: 30px; float: left; margin: 0px 0px 0px 2em;">
+        <a href="javascript:$('#myUploadFile').uploadify('upload','*')" onclick="checkFile();">上传</a>
+        <a href="javascript:$('#myUploadFile').uploadify('cancel','*')">全部取消</a>
+        <a href="~/UploadTemplate/">下载模板</a>
+    </p>
+    <div style="clear: both;"></div>
+    <p id="queue"></p>
+    <ol id="msg"></ol>
+    <div class="progress" style="display: none;">
+        <img src="~/Content/ajax-loader.gif" alt="" />
+    </div>
+</body>
+</html>
