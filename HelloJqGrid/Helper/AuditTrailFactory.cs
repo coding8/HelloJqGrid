@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HelloJqGrid.Models;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Data.Entity;
@@ -6,7 +7,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Text;
 
-namespace HelloJqGrid.Models
+namespace Helper
 {
     public class AuditTrailFactory
     {

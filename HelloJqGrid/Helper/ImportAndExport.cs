@@ -9,17 +9,14 @@ using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
 
-namespace HelloJqGrid.Models
+namespace Helper
 {
     public class ImportAndExport
     {
-        //public static string sqlConnectionString = @"Data Source=.\sql2012;Database=Cost3;Trusted_Connection=true;Persist Security Info=True";
         //从web.config中取值
         public static string sqlConnectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
-        ///<summary>
-        /// 导入Excel数据
-        ///</summary>
+        ///<summary>导入Excel数据</summary>
         /// <param name="filePath">上传文件路径</param>
         /// <param name="dbTableName">数据库表名</param>
         /// <param name="columnMapping">数据表列映射</param>
@@ -38,13 +35,13 @@ namespace HelloJqGrid.Models
                     {
                         dt.Load(excelReader);//转为DataTable
                         //已映射的列会传递给批量写入模块，此处只添加不在Excel表格中出现的字段，如一些共有字段或特殊字段。
-                        //dt.Columns.Add(new DataColumn("CreatedBy", typeof(System.String)));
+                        dt.Columns.Add(new DataColumn("CreatedBy", typeof(System.String)));
                         dt.Columns.Add(new DataColumn("CreatedOn", typeof(System.DateTime)));
 
                         //填充字段值        
                         foreach (DataRow dr in dt.Rows)
                         {
-                            //dr["CreatedBy"] = "Test";
+                            dr["CreatedBy"] = "Test";
                             dr["CreatedOn"] = DateTime.Now;
                         }
 
@@ -54,6 +51,7 @@ namespace HelloJqGrid.Models
                         }
                         catch (Exception)
                         {
+                            excelCommand.Dispose();
                             excelConnection.Close();//关闭excel连接
                             throw;
                         }
@@ -61,50 +59,6 @@ namespace HelloJqGrid.Models
                     excelConnection.Close();//关闭连接
                 }
             }
-            #region 未使用using语句
-            //OleDbConnection excelConnection = new OleDbConnection(excelConnectionString);
-            ////Create OleDbCommand to fetch data from Excel
-            //OleDbCommand cmd = new OleDbCommand("Select * from [Sheet1$]", excelConnection);//注意工作表名称叫Sheet1
-            //excelConnection.Open();//打开连接
-            //OleDbDataReader dReader = cmd.ExecuteReader();
-            ////转为datatable
-            //DataTable dt = new DataTable();
-            //dt.Load(dReader);
-            // 添加共有的额外的列
-            //string user = HttpContext.Current.User.Identity.Name;
-            //dt.Columns.Add(new DataColumn("CreatedBy", typeof(System.String)));
-            //dt.Columns.Add(new DataColumn("CreatedOn", typeof(System.DateTime)));
-            ////添加特定的列
-            //RouteData rd = HttpContext.Current.Request.RequestContext.RouteData;
-            //string currentController = rd.GetRequiredString("controller");
-            //string currentAction = rd.GetRequiredString("action");
-            //if (currentController == "Labour" || currentController == "RawStockQty")
-            //{
-            //    dt.Columns.Add(new DataColumn("FactoryCode", typeof(System.String)));
-            //    //填充列
-            //    foreach (DataRow dr in dt.Rows)
-            //    {
-            //        dr["FactoryCode"] = user;
-            //    }
-            //}
-            //// 填充额外的列            
-            //foreach (DataRow dr in dt.Rows)
-            //{
-            //    dr["CreatedBy"] = user;
-            //    dr["CreatedOn"] = DateTime.Now;
-            //}
-            //try
-            //{
-            //    BatchCopy(dt, dbTableName, columnMapping);//复制数据
-            //}
-            //catch (Exception)
-            //{
-            //    excelConnection.Close();//关闭连接，释放进程。
-            //    throw;
-            //}
-
-            //excelConnection.Close();//关闭连接
-            #endregion
         }
 
         ///<summary>复制数据-不带事务的</summary>
@@ -137,9 +91,7 @@ namespace HelloJqGrid.Models
             }
         }
 
-        ///<summary>
-        ///导出到Excel
-        ///</summary>
+        ///<summary>导出到Excel</summary>
         ///<param name="ctrl">包含数据的控件</param>
         ///<param name="fileName">文件名</param>
         public static void ExportToExcel(WebControl ctrl, string fileName)
@@ -159,9 +111,7 @@ namespace HelloJqGrid.Models
             HttpContext.Current.Response.End();
         }
 
-        /// <summary>
-        /// 复制数据
-        /// </summary>
+        /// <summary>复制数据-带事务</summary>
         /// <param name="dt">DataTable</param>
         /// <param name="destinationTableName">目标数据表名称</param>
         /// <param name="columnMapping">映射列</param>
@@ -202,6 +152,38 @@ namespace HelloJqGrid.Models
                 cnn.Close();//关闭连接
             }
             //return IsOK;
+        }
+
+        ///<summary>字段映射</summary>
+        ///<param name="fileName">文件名称</param>
+        ///<param name="columnMapping">输出映射表</param>
+        ///<param name="tbName">数据库表名</param>
+        public static void MappingColumn(string fileName, out string tbName, out List<string> columnMapping)
+        {
+            tbName = "";
+            columnMapping = new List<string>();
+
+            if (fileName != null)
+            {
+                switch (fileName)
+                {
+                    case "Member":
+                        tbName = "Member";
+                        columnMapping.Add("姓名,Name");
+                        columnMapping.Add("邮箱,Email");
+                        columnMapping.Add("生日,Birthday");
+                        columnMapping.Add("年龄,Age");
+                        break;
+                    case "COOIS":
+                       //do sth.
+                        break;
+                    default:
+                        break;
+                }
+                ////以下字段未在Excel表格中出现，需传给SqlBulkCopy。
+                columnMapping.Add("CreatedBy,CreatedBy");
+                columnMapping.Add("CreatedOn,CreatedOn");
+            }
         }
     }
 }
