@@ -169,7 +169,7 @@ namespace HelloJqGrid.Controllers
         {
             MyContext db = new MyContext();
             //Member member = db.Members.First(mb => mb.No == m.No);
-                      
+
             //member.Name = m.Name.Trim();
             //member.Email = m.Email;
             //member.Birthday = m.Birthday;
@@ -231,10 +231,10 @@ namespace HelloJqGrid.Controllers
         {
             MyContext db = new MyContext();
             var query = db.Guestbooks as IQueryable<Guestbook>;
-            var id =Convert.ToInt32(Request.QueryString["MemberId"]);
+            var id = Convert.ToInt32(Request.QueryString["MemberId"]);
             query = from g in query
-                        where g.Members.No ==id
-                        select g;
+                    where g.Members.No == id
+                    select g;
             return GridSearchHelper.GetQuery(grid, query);
         }
 
@@ -243,7 +243,7 @@ namespace HelloJqGrid.Controllers
         {
             return View();
         }
-        public ActionResult GetDetailGridData(GridSettings grid, int id=0)
+        public ActionResult GetDetailGridData(GridSettings grid, int id = 0)
         {
             MyContext db = new MyContext();
             var query = db.Guestbooks as IQueryable<Guestbook>;
@@ -260,16 +260,60 @@ namespace HelloJqGrid.Controllers
         [HttpPost]
         public ActionResult UploadFile(IEnumerable<HttpPostedFileBase> uploadfile)//TODO:加入判断及错误捕捉
         {
+            ViewBag.msg = "";
             foreach (var file in uploadfile)
             {
                 if (file != null && file.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(file.FileName);
                     var path = Path.Combine(Server.MapPath("~/Uploads"), fileName);
+                    //如遇相同文件则先删除再保存
+                    if (System.IO.File.Exists(path))
+                        System.IO.File.Delete(path);
                     file.SaveAs(path);
                 }
             }
-            return RedirectToAction("UploadFile");
+            //导入excel数据，从文件夹中依次读取文件
+            var folder = Server.MapPath("~/Uploads");
+            var tbName = "";
+            string[] files = Directory.GetFiles(folder);
+            if (files.Length != 0)
+            {
+                foreach (var file in files)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file);
+                    switch (fileName)
+                    {
+                        case "Member":
+                            tbName = "Member";
+                            break;
+                        default:
+                            System.IO.File.Delete(file);
+                            break;
+                    }
+                    try
+                    {
+                        //字段映射（Excel的列名与数据表字段对应）
+                        var columnMapping = new List<string>();
+                        columnMapping.Add("Name,Name");
+                        columnMapping.Add("邮箱,Email");
+                        columnMapping.Add("生日,Birthday");
+                        columnMapping.Add("Age,Age");
+                        //以下字段未在Excel表格中出现，需传给SqlBulkCopy。
+                        columnMapping.Add("CreatedOn,CreatedOn");
+
+                        ImportAndExport.ImportExcel(file, tbName, columnMapping);
+                        System.IO.File.Delete(file);
+                        return Json(new { success = true, message = "导入成功！", fileName = fileName }, "text/html");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.IO.File.Delete(file);
+                        return Json(new { success = false, message = "导入失败" + ex.Message, fileName = fileName }, "text/html");
+                    }
+                }
+            }
+            return View("UploadFile");
         }
     }
 }

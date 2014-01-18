@@ -139,6 +139,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AuditTrailFactory.cs" />
+    <Compile Include="Models\ImportAndExport.cs" />
     <Compile Include="Models\MvcJqGrid.cs" />
     <Compile Include="Models\MyContext.cs" />
     <Compile Include="Models\MyEntity.cs" />
@@ -277,6 +278,7 @@
     <Content Include="Scripts\jquery-1.8.3.min.js" />
     <Content Include="Scripts\jquery-ui-1.9.2.js" />
     <Content Include="Scripts\jquery-ui-1.9.2.min.js" />
+    <Content Include="Scripts\jquery.form.min.js" />
     <Content Include="Scripts\jquery.jqGrid.min.js" />
     <Content Include="Scripts\jquery.jqGrid.src.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
