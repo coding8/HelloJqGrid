@@ -20,24 +20,31 @@
                 },
                 validation: {
                     //itemLimit: 3,
-                    allowedExtensions: ['jpg', 'xlsx', 'txt'],
+                    allowedExtensions: ['jpg', 'xlsx','xls', 'txt'],
                     sizeLimit: 10240000 // 10M
                 },
                 template: "qq-template-manual-noedit",
                 autoUpload: false,
-                failedUploadTextDisplay: {
-                    mode: 'default',
-                    maxChars: 50,
-                    responseProperty: 'error',
-                    enableTooltip: true
-                },
 
                 callbacks:
                 {
-                    //文件开始提交
+                    //文件开始提交(在浏览窗口中选择的每个文件都会触发该事件）
+                    //id:文件在队列中的索引
+                    //fileName:文件名称
                     onSubmit: function (id, fileName) {
-                        //alert('this is  onSubmit Function');
-                        //$('#messages').append('<div id="file-' + id + '" class="alert" style="margin: 20px 0 0"></div>');
+                        //alert('this is  onSubmit Function，your selected is：' + fileName);
+                        //只能上传规定的文件
+                        var name = fileName.split('.')[0];//不带后缀名
+                        switch (name) {
+                            case 'Member':
+                                break;
+                            case 'Guestbook':
+                                break;
+                            default:
+                                alert('请选择正确的文件上传!');
+                                return false;
+                                break;                              
+                        }
                     },
                     //文件开始上传
                     onUpload: function (id, fileName) {
@@ -57,8 +64,11 @@
                         //alert('This is onComplete function.');
                         //alert("complete name:"+responseJSON.name);//responseJSON就是controller传来的return Json
                         $('#message').append(responseJSON.msg);
-                        $('#progress').hide();//隐藏进度动画              
-                    },
+                        $('#progress').hide();//隐藏进度动画   
+                        //清除已上传队列
+                        $('.qq-upload-list').hide();
+                        //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）                       
+                    }
                 }
             });
 

@@ -173,8 +173,9 @@ namespace Helper
                         columnMapping.Add("生日,Birthday");
                         columnMapping.Add("年龄,Age");
                         break;
-                    case "COOIS":
-                        //do sth.
+                    case "Guestbook":
+                        tbName = "Guestbooks";
+                        columnMapping.Add("消息,Message");
                         break;
                     default:
                         break;
@@ -185,7 +186,7 @@ namespace Helper
             }
         }
 
-        ///<summary>循环上传文件写入数据库</summary>
+        ///<summary>循环上传文件写入数据库(Uploadify)</summary>
         ///<param name="server">Web服务器</param>
         ///<returns name="str">上传文件名及上传情况</returns>
         public static string BatchUpload(HttpServerUtilityBase server)
@@ -210,8 +211,9 @@ namespace Helper
                             columnMapping.Add("生日,Birthday");
                             columnMapping.Add("年龄,Age");
                             break;
-                        case "COOIS":
-                            //do sth.
+                        case "Guestbook":
+                            tbName = "Guestbooks";
+                            columnMapping.Add("消息,Message");
                             break;
                         default:
                             break;

@@ -16,6 +16,8 @@ namespace HelloJqGrid.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime? CreatedOn { get; set; }
 
+        public string CreatedBy { get; set; }
+
         //导航属性
         public Member Members { get; set; }
     }
