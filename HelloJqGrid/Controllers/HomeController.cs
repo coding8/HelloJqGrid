@@ -316,5 +316,13 @@ namespace HelloJqGrid.Controllers
             }
             return View("UploadFile");
         }
+
+        //自动完成
+        public ActionResult QuickSearch(string term)
+        {
+            MyContext db=new MyContext  ();
+            var q = db.Members.Where(a => a.Name.Contains(term)).Select(a => new { value = a.Name }).Take(10);
+            return Json(q, JsonRequestBehavior.AllowGet);
+        }
     }
 }

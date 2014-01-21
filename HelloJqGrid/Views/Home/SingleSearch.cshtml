@@ -2,6 +2,14 @@
     ViewBag.Title = "SingleSearch";
 }
 <script src="~/ViewJs/SingleSearch.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("input[data-autocomplete]").each(function () {
+            var target = $(this);
+            target.autocomplete({source:target.attr("data-autocomplete")});
+        });
+    });
+</script>
 <h2>SingleSearch</h2>
 
     <select id="searchField" name="searchField">
@@ -12,7 +20,7 @@
          <option value="eq">等于</option>
          <option value="cn">包含</option>
     </select>
-    <input type="text" id="searchString" name="searchString" />
+    <input type="text" id="searchString" name="searchString" data-autocomplete="@Url.Action("QuickSearch","Home")" />
     <button onclick="singleSearch()">search</button>
     <button onclick="clearSearch()">重置搜索条件</button>
 
