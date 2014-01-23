@@ -18,7 +18,7 @@ namespace Helper
         //从web.config中取值
         public static string sqlConnectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
-        ///<summary>导入Excel数据</summary>
+        /// <summary>导入Excel数据</summary>
         /// <param name="filePath">上传文件路径</param>
         /// <param name="dbTableName">数据库表名</param>
         /// <param name="columnMapping">数据表列映射</param>
@@ -63,9 +63,9 @@ namespace Helper
             }
         }
 
-        ///<summary>导出到Excel</summary>
-        ///<param name="ctrl">包含数据的控件</param>
-        ///<param name="fileName">文件名</param>
+        /// <summary>导出到Excel（use WebControl）</summary>
+        /// <param name="ctrl">包含数据的控件</param>
+        /// <param name="fileName">文件名</param>
         public static void ExportToExcel(WebControl ctrl, string fileName)
         {
             HttpContext.Current.Response.Clear();
@@ -83,10 +83,56 @@ namespace Helper
             HttpContext.Current.Response.End();
         }
 
-        ///<summary>复制数据-不带事务的</summary>
+        /// <summary>导出到Excel（use DataTable）
+        /// </summary>
+        /// <param name="dt"></param>
+        public static void ExportToExcel(DataTable dt, string fileName)
+        {
+            string outputFileName = null;  
+            string browser = HttpContext.Current.Request.UserAgent.ToUpper();  
+  
+            //消除文件名乱码。如果是IE则编码文件名，如果是FF则在文件名前后加双引号。
+            if (browser.Contains("MS") == true && browser.Contains("IE") == true)
+                outputFileName = HttpUtility.UrlEncode(fileName);  //%e5%90%8d%e5%8d%95
+            else if (browser.Contains("FIREFOX") == true)  
+                outputFileName = "\"" + fileName + ".xls\"";  //"名单.xls" 
+            else  
+                outputFileName = HttpUtility.UrlEncode(fileName);
+
+            HttpResponse Response = HttpContext.Current.Response;
+
+            Response.ClearContent();
+            Response.AddHeader("content-disposition", "attachment; filename=" + outputFileName + ".xls");
+            Response.ContentEncoding = System.Text.Encoding.GetEncoding("gb2312");
+            Response.Charset = "gb2312";
+            Response.ContentType = "application/ms-excel";
+
+            string tab = "";
+            foreach (DataColumn dc in dt.Columns)
+            {
+                HttpContext.Current.Response.Write(tab + dc.ColumnName);
+                tab = "\t";
+            }
+            HttpContext.Current.Response.Write("\n");
+
+            int i;
+            foreach (DataRow dr in dt.Rows)
+            {
+                tab = "";
+                for (i = 0; i < dt.Columns.Count; i++)
+                {
+                    HttpContext.Current.Response.Write(tab + dr[i].ToString());
+                    tab = "\t";
+                }
+                HttpContext.Current.Response.Write("\n");
+            }
+            HttpContext.Current.Response.End();
+        }
+
+        /// <summary>复制数据-不带事务的</summary>
         /// <param name="dt">源数据</param>
         /// <param name="tbName">目标数据表名称</param>
-        ///<param name="columnMapping">完整的字段映射</param>
+        /// <param name="columnMapping">完整的字段映射</param>
         public static void BatchCopy0(DataTable dt, string tbName, List<string> columnMapping)
         {
             using (SqlBulkCopy sbc = new SqlBulkCopy(sqlConnectionString, SqlBulkCopyOptions.KeepNulls))
@@ -155,10 +201,10 @@ namespace Helper
             //return IsOK;
         }
 
-        ///<summary>字段映射</summary>
-        ///<param name="fileName">文件名称</param>
-        ///<param name="columnMapping">输出映射表</param>
-        ///<param name="tbName">数据库表名</param>
+        /// <summary>字段映射</summary>
+        /// <param name="fileName">文件名称</param>
+        /// <param name="columnMapping">输出映射表</param>
+        /// <param name="tbName">数据库表名</param>
         public static void MappingColumn(string fileName, out string tbName, out List<string> columnMapping)
         {
             tbName = "";
@@ -188,9 +234,9 @@ namespace Helper
             }
         }
 
-        ///<summary>循环上传文件写入数据库(Uploadify)</summary>
-        ///<param name="server">Web服务器</param>
-        ///<returns name="str">上传文件名及上传情况</returns>
+        /// <summary>循环上传文件写入数据库(Uploadify)</summary>
+        /// <param name="server">Web服务器</param>
+        /// <returns name="str">上传文件名及上传情况</returns>
         public static string BatchUpload(HttpServerUtilityBase server)
         {
             var folder = server.MapPath("~/Uploads");
@@ -247,11 +293,11 @@ namespace Helper
             return str;
         }
 
-        /// <summary>泛型列表List转换为DataTable</summary>
+        /// <summary>泛型转换为DataTable</summary>
         /// <typeparam name="T">实体类</typeparam>
         /// <param name="data">泛型列表</param>
         /// <returns>返回一个DataTable对象</returns>
-       // public static DataTable ConvertToDatatable<T>(IList<T> data)//(this IList<T> data) remove "this" if not on C# 3.0 / .NET 3.5*/
+        // public static DataTable ConvertToDatatable<T>(IList<T> data)//(this IList<T> data) remove "this" if not on C# 3.0 / .NET 3.5*/
         public static DataTable ConvertToDatatable<T>(IEnumerable<T> data)
         {
             PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(T));

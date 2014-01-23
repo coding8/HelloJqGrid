@@ -8,7 +8,7 @@
             { label: 'Number', name: 'No', index: 'No', width: 60, sorttype: "int" },
             { label: 'Name', name: 'Name', index: 'Name', width: 90 },
             { label: 'Email', name: 'Email', index: 'Email', width: 100, sortable: false },
-            { label: 'Age',name:'Age',index:'Age'},
+            { label: 'Age', name: 'Age', index: 'Age' },
             {
                 label: 'Birthday', name: 'Birthday', index: 'Birthday', width: 100,
                 formatter: 'date', formatoptions: { srcformat: 'Y-m-d', newformat: 'Y-m-d' },
@@ -59,7 +59,7 @@ function multipleSearch() {
 
     $("#grid").jqGrid("setGridParam", {
         search: true    //将jqGrid的search选项设为true  
-    }).trigger("reloadGrid", [{ page: 1 }]);   
+    }).trigger("reloadGrid", [{ page: 1 }]);
 }
 
 //重置搜索条件
@@ -74,21 +74,14 @@ var clearSearch = function () {
     $(".searchString").val("");
 };
 
+//导出到Excel
 function exportToExcel() {
+    //是否筛选
     var IsSearch = $("#grid").jqGrid('getGridParam', 'search');
     //筛选条件
     var filtersStr = $("#grid").jqGrid('getGridParam', 'postData').filters;
-    if (filtersStr == null) { filtersStr = "";}
-    //将filters参数串加入postData选项  
-    //var postData = $("#grid").jqGrid("getGridParam", "postData");
-    //$.extend(postData, { filters: filtersStr, _search: IsSearch });
+    if (filtersStr == null) { filtersStr = ""; }
 
-    //window.open("/Home/ExportToExcel");
-    window.open("/Home/ExportToExcel?filters=" + filtersStr+"&_search="+IsSearch);
-    //$.get('/Home/ExportToExcel', { filters: filtersStr,sidx:'No',_search:IsSearch },
-    //    function () {
-    //        alert("ok");
-    //       // Window.location='/Home/MultipleSearch'
-    //    }
-    //);
+    //导出文件不能用异步
+    window.open("/Home/ExportToExcel?filters=" + filtersStr + "&_search=" + IsSearch);
 }

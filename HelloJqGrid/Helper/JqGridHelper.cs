@@ -124,8 +124,8 @@ namespace Helper
         }
 
         /// <summary>输出筛选后的记录</summary>
-        /// <para name="gird">Grid设置类</param>
-        /// <para name="query">IQueryable类型的实体</para>
+        /// <param name="gird">Grid设置类</param>
+        /// <param name="query">IQueryable类型的实体</param>
         /// <returns>返回一个泛型列表对象</returns>
         public static List<T>  GetFilteredData<T>(GridSettings grid, IQueryable<T> query)
         {

@@ -343,54 +343,24 @@ namespace Helper.Controllers
             MyContext db = new MyContext();
             var query = db.Members as IQueryable<Member>;
 
-            //List<Member> list;
-            //ImportAndExport.ForExcel<Member>(grid, query, out list);
-
             //获得数据后按需求输出相关字段
             var list = JqGridHelper.GetFilteredData(grid, query);
-            var adjustList = from p in list
-                             select new
-                             {
-                                 序号 = p.No,
-                                 姓名 = p.Name,
-                                 年龄 = p.Age,
-                                 生日 = p.Birthday,
-                                 邮箱 = p.Email
-                             };
-            
-            //DataTable dt = ImportAndExport.ConvertToDatatable<Member>(list);
-            DataTable dt = ImportAndExport.ConvertToDatatable(adjustList);
-            
-            //输出设置
-            string attachment = "attachment; filename=Employee.xls";
-            Response.ClearContent();
-            Response.AddHeader("content-disposition", attachment);
-            Response.ContentEncoding = System.Text.Encoding.GetEncoding("gb2312");
-            Response.Charset = "gb2312";
-            Response.ContentType = "application/ms-excel";
+            var outputTable = from p in list
+                              select new
+                              {
+                                  序号 = p.No,
+                                  姓名 = p.Name,
+                                  年龄 = p.Age,
+                                  生日 = p.Birthday,
+                                  邮箱 = p.Email
+                              };
 
-            string tab = "";
-            foreach (DataColumn dc in dt.Columns)
-            {
-                Response.Write(tab + dc.ColumnName);
-                tab = "\t";
-            }
-            Response.Write("\n");
+            //转换为DataTable类型
+            DataTable dt = ImportAndExport.ConvertToDatatable(outputTable);
+            //导出到Excel
+            string fileName = "名单";
+            ImportAndExport.ExportToExcel(dt, fileName);
 
-            int i;
-            foreach (DataRow dr in dt.Rows)
-            {
-                tab = "";
-                for (i = 0; i < dt.Columns.Count; i++)
-                {
-                    Response.Write(tab + dr[i].ToString());
-                    tab = "\t";
-                }
-                Response.Write("\n");
-            }
-            Response.End();
-
-            //return View("MultipleSearch");
             return Content("");
         }
     }
