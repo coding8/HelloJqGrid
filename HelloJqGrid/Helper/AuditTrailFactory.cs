@@ -1,4 +1,4 @@
-﻿using HelloJqGrid.Models;
+﻿using Helper.Models;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;

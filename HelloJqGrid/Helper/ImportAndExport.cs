@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MvcJqGrid;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
@@ -243,6 +245,72 @@ namespace Helper
                 }
             }
             return str;
+        }
+
+        /// <summary>泛型列表List转换为DataTable</summary>
+        /// <typeparam name="T">实体类</typeparam>
+        /// <param name="data">泛型列表</param>
+        /// <returns>返回一个DataTable对象</returns>
+       // public static DataTable ConvertToDatatable<T>(IList<T> data)//(this IList<T> data) remove "this" if not on C# 3.0 / .NET 3.5*/
+        public static DataTable ConvertToDatatable<T>(IEnumerable<T> data)
+        {
+            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(typeof(T));
+            DataTable table = new DataTable();
+
+            for (int i = 0; i < props.Count; i++)
+            {
+                PropertyDescriptor prop = props[i];
+                //table.Columns.Add(prop.Name, prop.PropertyType);//出错！DataSet 不支持 System.Nullable<>。
+                //因为 DataColumn 不支持 Nullable<T> 类型，空值只能使用DBNull。
+                table.Columns.Add(prop.Name);
+            }
+
+            object[] values = new object[props.Count];
+
+            foreach (T item in data)
+            {
+                for (int i = 0; i < values.Length; i++)
+                {
+                    values[i] = props[i].GetValue(item);
+                }
+                table.Rows.Add(values);
+            }
+            return table;
+        }
+
+        /// <summary>为JqGrid导出到Excel提供数据(输出参数和return哪个更有效率？)</summary>
+        /// <typeparam name="T">实体类</typeparam>
+        /// <param name="grid">表格属性</param>
+        /// <param name="query">数据源</param>
+        /// <param name="data">输出给Excel的数据，是一个泛型List类型"/></param>
+        public static void ForExcel<T>(GridSettings grid, IQueryable<T> query, out List<T> data)
+        {
+            //filtring
+            if (grid.IsSearch)  //_search == true
+            {
+                //And
+                if (grid.Where.groupOp == "AND")
+                    foreach (var rule in grid.Where.rules)
+                        query = query.Where<T>(rule.field, rule.data, (WhereOperation)StringEnum.Parse(typeof(WhereOperation), rule.op));
+                else
+                {  //更新--2013.10.26
+                    IQueryable<T> temp = null;
+                    foreach (var rule in grid.Where.rules)
+                    {
+                        var rule1 = rule;
+                        var t = query.Where<T>(rule1.field, rule1.data, (WhereOperation)StringEnum.Parse(typeof(WhereOperation), rule1.op));
+
+                        if (temp == null)
+                            temp = t;
+                        else
+                            //temp = temp.Union(t); // Union!!
+                            temp = temp.Concat<T>(t);//使用union会导致查不出数据
+                    }
+                    query = temp.Distinct<T>();
+                }
+            }
+            //sorting
+            data = query.OrderBy<T>(grid.SortColumn, grid.SortOrder).ToList();
         }
     }
 }

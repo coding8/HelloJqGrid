@@ -6,7 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace HelloJqGrid.Controllers
+namespace Helper.Controllers
 {
     public class UploadifyController : Controller
     {

@@ -3,6 +3,7 @@
 }
 <script src="~/ViewJs/MultipleSearch.js"></script>
 <h2>MultipleSearch</h2>
+
 <div id="multipleSearch">
     <table class="formTable">
         <thead>
@@ -58,6 +59,8 @@
 
     <button onclick="multipleSearch()">search</button>
     <button onclick="clearSearch()">清空搜索条件</button>
+    <a href="/Home/ExportToExcel">export to excel</a>
+    <button onclick="exportToExcel()">excel</button>
 </div>
 
 <table id="grid"></table>

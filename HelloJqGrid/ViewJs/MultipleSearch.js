@@ -60,7 +60,7 @@ function multipleSearch() {
     $("#grid").jqGrid("setGridParam", {
         search: true    //将jqGrid的search选项设为true  
     }).trigger("reloadGrid", [{ page: 1 }]);   
-};
+}
 
 //重置搜索条件
 var clearSearch = function () {
@@ -73,3 +73,22 @@ var clearSearch = function () {
 
     $(".searchString").val("");
 };
+
+function exportToExcel() {
+    var IsSearch = $("#grid").jqGrid('getGridParam', 'search');
+    //筛选条件
+    var filtersStr = $("#grid").jqGrid('getGridParam', 'postData').filters;
+    if (filtersStr == null) { filtersStr = "";}
+    //将filters参数串加入postData选项  
+    //var postData = $("#grid").jqGrid("getGridParam", "postData");
+    //$.extend(postData, { filters: filtersStr, _search: IsSearch });
+
+    //window.open("/Home/ExportToExcel");
+    window.open("/Home/ExportToExcel?filters=" + filtersStr+"&_search="+IsSearch);
+    //$.get('/Home/ExportToExcel', { filters: filtersStr,sidx:'No',_search:IsSearch },
+    //    function () {
+    //        alert("ok");
+    //       // Window.location='/Home/MultipleSearch'
+    //    }
+    //);
+}

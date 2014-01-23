@@ -1,5 +1,5 @@
 ﻿
-namespace HelloJqGrid.ViewModel
+namespace Helper.ViewModel
 {
     public class JqGridViewModel
     {

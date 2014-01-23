@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace HelloJqGrid
+namespace Helper
 {
     public class FilterConfig
     {

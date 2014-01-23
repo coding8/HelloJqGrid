@@ -2,16 +2,18 @@
 using System.Collections;
 using System.Web.Mvc;
 using System.Linq;
-using HelloJqGrid.Models;
-using HelloJqGrid.ViewModel;
+using Helper.Models;
+using Helper.ViewModel;
 using System.Linq.Dynamic;
 using MvcJqGrid;
 using System.Collections.Generic;
 using System.Web;
 using System.IO;
 using Helper;
+using System.Data;
+using System.ComponentModel;
 
-namespace HelloJqGrid.Controllers
+namespace Helper.Controllers
 {
     public class HomeController : Controller
     {
@@ -214,7 +216,7 @@ namespace HelloJqGrid.Controllers
             MyContext db = new MyContext();
             var query = db.Members as IQueryable<Member>;
 
-            return GridSearchHelper.GetQuery(grid, query);
+            return JqGridHelper.GetQuery(grid, query);
         }
 
         //多条件查询
@@ -236,7 +238,7 @@ namespace HelloJqGrid.Controllers
             query = from g in query
                     where g.Members.No == id
                     select g;
-            return GridSearchHelper.GetQuery(grid, query);
+            return JqGridHelper.GetQuery(grid, query);
         }
 
         //MasterDetail
@@ -252,14 +254,14 @@ namespace HelloJqGrid.Controllers
                     where g.Members.No == id
                     select g;
 
-            return GridSearchHelper.GetQuery(grid, query);
+            return JqGridHelper.GetQuery(grid, query);
         }
 
-        //上传文件
+        //上传文件->建议使用FineUploader
         [HttpGet]
         public ActionResult UploadFile() { return View(); }
         [HttpPost]
-        public ActionResult UploadFile(IEnumerable<HttpPostedFileBase> uploadfile)//TODO:加入判断及错误捕捉
+        public ActionResult UploadFile(IEnumerable<HttpPostedFileBase> uploadfile)
         {
             ViewBag.msg = "";
             foreach (var file in uploadfile)
@@ -320,9 +322,76 @@ namespace HelloJqGrid.Controllers
         //自动完成
         public ActionResult QuickSearch(string term)
         {
-            MyContext db=new MyContext  ();
+            MyContext db = new MyContext();
             var q = db.Members.Where(a => a.Name.Contains(term)).Select(a => new { value = a.Name }).Take(10);
             return Json(q, JsonRequestBehavior.AllowGet);
+        }
+
+        //导出到Excel->use DataTable
+        public ActionResult ExportToExcel()
+        {
+            //构造一个GridSettings实例接收筛选后的数据
+            GridSettings grid = new GridSettings();
+            grid.SortColumn = "No";
+            grid.SortOrder = "asc";
+            grid.IsSearch = Convert.ToBoolean(Request.QueryString["_search"]);
+
+            //筛选条件
+            string filter = Request.QueryString["filters"];
+            grid.Where = MvcJqGrid.Filter.Create(filter, "", "", "");
+
+            MyContext db = new MyContext();
+            var query = db.Members as IQueryable<Member>;
+
+            //List<Member> list;
+            //ImportAndExport.ForExcel<Member>(grid, query, out list);
+
+            //获得数据后按需求输出相关字段
+            var list = JqGridHelper.GetFilteredData(grid, query);
+            var adjustList = from p in list
+                             select new
+                             {
+                                 序号 = p.No,
+                                 姓名 = p.Name,
+                                 年龄 = p.Age,
+                                 生日 = p.Birthday,
+                                 邮箱 = p.Email
+                             };
+            
+            //DataTable dt = ImportAndExport.ConvertToDatatable<Member>(list);
+            DataTable dt = ImportAndExport.ConvertToDatatable(adjustList);
+            
+            //输出设置
+            string attachment = "attachment; filename=Employee.xls";
+            Response.ClearContent();
+            Response.AddHeader("content-disposition", attachment);
+            Response.ContentEncoding = System.Text.Encoding.GetEncoding("gb2312");
+            Response.Charset = "gb2312";
+            Response.ContentType = "application/ms-excel";
+
+            string tab = "";
+            foreach (DataColumn dc in dt.Columns)
+            {
+                Response.Write(tab + dc.ColumnName);
+                tab = "\t";
+            }
+            Response.Write("\n");
+
+            int i;
+            foreach (DataRow dr in dt.Rows)
+            {
+                tab = "";
+                for (i = 0; i < dt.Columns.Count; i++)
+                {
+                    Response.Write(tab + dr[i].ToString());
+                    tab = "\t";
+                }
+                Response.Write("\n");
+            }
+            Response.End();
+
+            //return View("MultipleSearch");
+            return Content("");
         }
     }
 }
