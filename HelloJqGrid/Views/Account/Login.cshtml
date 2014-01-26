@@ -1,0 +1,45 @@
+﻿@model Models.LoginModel
+
+@{
+    ViewBag.Title = "登录";
+}
+<script type="text/javascript">
+    $(function () { $('#UserName').focus();});
+</script>
+<hgroup class="title">
+    <h1>@ViewBag.Title.</h1>
+</hgroup>
+
+<section id="loginForm">
+    @using (Html.BeginForm(new { ReturnUrl = ViewBag.ReturnUrl }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <fieldset>
+            <legend>登录表单</legend>
+            <p>
+                @Html.LabelFor(m => m.UserName)
+                @Html.TextBoxFor(m => m.UserName, new { style = "width:12em" })
+                @Html.ValidationMessageFor(m => m.UserName)
+            </p>
+
+            <p>
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password, new { style = "width:12em" })
+                @Html.ValidationMessageFor(m => m.Password)
+            </p>
+            @Html.CheckBoxFor(m => m.RememberMe)
+            @Html.LabelFor(m => m.RememberMe, new { @class = "checkbox" })
+
+            <input type="submit" value="登录" />
+        </fieldset>
+        <p>
+            @Html.ActionLink("注册", "Register") 如果你没有帐户。
+        </p>
+    }
+</section>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

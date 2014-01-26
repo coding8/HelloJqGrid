@@ -5,7 +5,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 
-namespace Helper.Models
+namespace HelloJqGrid
 {
     public class MyContext:DbContext
     {

@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "UserManagement";
+}
+
+<h2>User Management</h2>
+
+<script type="text/javascript">
+    function addRole() {
+        $.post('/UserManagement/AddRole',
+            { RoleName: $('#RoleName').val() },
+            function success() {
+                alert($('#RoleName').val() + " OK!");
+                $('#RoleName').val('');
+            }
+        )
+    }
+
+    function deleteRole() {
+        $.post('/UserManagement/DeleteRole',
+            { RoleName: $('#RoleName').val() },
+            function success() {
+                alert("Delete " + $('#RoleName').val() + " OK");
+                $('#RoleName').val('');
+            }
+        )
+    }
+
+    function deleteUser() {
+        var user = $('#UserName');
+        $.post('/UserManagement/DeleteUser',
+            { UserName: user.val() },
+            function success(data) {
+                alert(data.msg);
+                user.val('');
+            }, "json"
+        )
+    }
+
+    function addUser() {
+        var user = $('#addUser');
+        var password = $('#addPassword');
+        var passwordCfm = $('#addPasswordCfm');
+        $.post('/UserManagement/Register',
+            {
+                UserName: user.val(),
+                Password: password.val(),
+                ConfirmPassword: passwordCfm.val()
+            },
+            function success(data) { alert(data.msg); }, "json"
+        )
+    }
+
+    function addUserToRole() {
+        var user = $('#user');
+        var role = $('#role').find("option:selected").text();
+        $.post('/UserManagement/AddUserToRole',
+            {
+                User: user.val(),
+                Role: role
+            },
+            function success(data) {
+                alert(data.msg);
+                user.val('');
+                user.focus();
+            }, "json"
+        )
+    }
+
+    function removeUserFromRole() {
+        var user = $('#user');
+        var role = $('#role').find("option:selected").text();
+        $.post('/UserManagement/RemoveUserFromRole',
+            {
+                User: user.val(),
+                Role: role
+            },
+            function success(data) {
+                alert(data.msg);
+                user.val('');
+                user.focus();
+            }, "json"
+        )
+    }
+
+    function resetPassword() {
+        var user = $('#resetPSW').val();
+        $.post('/UserManagement/ResetPwd',
+            { user: user },
+            function success(data) {
+                alert(data.msg);
+            }, "json")
+    }
+</script>
+@*<form action="/UserManagement/AddRole" method="post">*@
+<h3>Role</h3>
+<label>Role Name:</label>
+<input type="text" id="RoleName" />
+<input type="button" value="Add Role" onclick="addRole();" />
+<input type="button" value="Delete Role" onclick="deleteRole();" />
+
+<h3>Add User</h3>
+<label>User Name:</label><input type="text" id="addUser" />
+<label>Password:</label><input type="text" id="addPassword" />
+<label>Confirm Password:</label><input type="text" id="addPasswordCfm" />
+<input type="button" value="Add user" onclick="addUser();" />
+
+
+<h3>Delete User</h3>
+<label>User Name:</label><input type="text" id="UserName" />
+<input type="button" value="Delete User" onclick="deleteUser();" />
+
+<h3>Add User To Role</h3>
+<label>User Name:</label><input type="text" id="user" />
+<select id="role">
+    <option value="">--</option>
+    <option value="administrator">Administrator</option>
+    <option value="technic">Technic</option>
+    <option value="factory">Factory</option>
+    <option value="finance">Finance</option>
+    <option value="datamanager">DataManager</option>
+</select>
+<input type="button" value="Add User To Role" onclick="addUserToRole();" />
+<input type="button" value="Remove User From Role" onclick="removeUserFromRole()" />
+
+<h3>Reset Password(123)</h3>
+<label>User Name:</label>:<input type="text" id="resetPSW" />
+<input type="button" value="Reset Password" onclick="resetPassword();" />
+@*</form>*@

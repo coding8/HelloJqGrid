@@ -2,18 +2,16 @@
 using System.Collections;
 using System.Web.Mvc;
 using System.Linq;
-using Helper.Models;
-using Helper.ViewModel;
+using Models.ViewModel;
 using System.Linq.Dynamic;
 using MvcJqGrid;
 using System.Collections.Generic;
 using System.Web;
 using System.IO;
-using Helper;
 using System.Data;
-using System.ComponentModel;
+using Helper;
 
-namespace Helper.Controllers
+namespace HelloJqGrid.Controllers
 {
     public class HomeController : Controller
     {
