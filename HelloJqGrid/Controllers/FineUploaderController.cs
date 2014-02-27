@@ -40,13 +40,14 @@ namespace HelloJqGrid.Controllers
                     ImportAndExport.MappingColumn(fileName, out tbName, out columnMapping);
                     ImportAndExport.ImportExcel(path, tbName, columnMapping);
                     System.IO.File.Delete(path);
-                    msg = "<p style='background-color:#5DA30C'>写入成功: " + fileName + "</p>";
+                    msg = "<p style='background-color:#5DA30C'>写入成功: " + fileName + " --> 时间：" + DateTime.Now + "</p>";
                 }
                 catch (Exception ex)
                 {
                     System.IO.File.Delete(path);
-                    msg = "<p style='background-color:#D60000'>写入失败: " + fileName + " [" + ex.Message + "]</p>";
-                    return Json(new { success = false, error = ex.Message, msg = msg }, "text/html");
+                    msg = "<p style='background-color:#D60000'>写入失败: " + fileName + " --> 时间：" + DateTime.Now + " --> [" + ex.Message + "]</p>";
+                    var errorMsg = "写入失败: " + fileName + " --> 时间：" + DateTime.Now + " --> [" + ex.Message + "]";
+                    return Json(new { success = false, error = errorMsg, msg = msg }, "text/html");
                 }
             }
             //返回的json要有success字段：success = true 上传成功；success=false 上传失败。

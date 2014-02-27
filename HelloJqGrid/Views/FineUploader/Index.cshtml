@@ -18,6 +18,13 @@
                 request: {
                     endpoint: '/FineUploader/Index'
                 },
+                //显示错误信息（Controller返回的json）
+                failedUploadTextDisplay: {
+                    mode: 'custom',
+                    maxChars: 400,
+                    responseProperty: 'error',
+                    enableTooltip: true
+                },
                 validation: {
                     //itemLimit: 3,
                     allowedExtensions: ['jpg', 'xlsx','xls', 'txt'],
@@ -61,13 +68,14 @@
                     },
                     //文件上传结束
                     onComplete: function (id, fileName, responseJSON) {
+                        //上传失败的保留在上面，成功的显示在下面。
+                        if (responseJSON.success == true) {
+                            $(this.getItemByFileId(id)).hide('slow');
+                            $('#message').append(responseJSON.msg);
+                        }
                         //alert('This is onComplete function.');
                         //alert("complete name:"+responseJSON.name);//responseJSON就是controller传来的return Json
-                        $('#message').append(responseJSON.msg);
-                        $('#progress').hide();//隐藏进度动画   
-                        //清除已上传队列
-                        $('.qq-upload-list').hide();
-                        //$('#manual-fine-uploader').fineUploader('reset');//（这个倒是清除了，但是返回的信息$('#message')里只能保留一条。）                       
+                        $('#progress').hide();//隐藏进度动画                      
                     }
                 }
             });
