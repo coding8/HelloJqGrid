@@ -69,6 +69,8 @@
                     //文件上传结束
                     onComplete: function (id, fileName, responseJSON) {
                         //上传失败的保留在上面，成功的显示在下面。
+                        //For the jQuery version, use $($(this).fineUploader('getItemByFileId', id)).hide('slow'); 
+                        //I suggest adding this to the answer, I struggled for some time till I could figure this out. –  Iravanchi Jun 21 '13 
                         if (responseJSON.success == true) {
                             $(this.getItemByFileId(id)).hide('slow');
                             $('#message').append(responseJSON.msg);
