@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Helper
 {
@@ -22,6 +23,9 @@ namespace Helper
             Audit audit = new Audit();
             //var user = (User)HttpContext.Current.Session[":user"];
             //audit.UserId = user.UserName;
+
+            audit.UserId = HttpContext.Current.User.Identity.Name;//当前登陆用户
+
             audit.TableName = GetTableName(entry);
             audit.UpdateDate = DateTime.Now;
             audit.TableIdValue = GetKeyValue(entry);
@@ -92,14 +96,17 @@ namespace Helper
             {
                 var oldVal = dbValues[propertyName];
                 var newVal = entry.CurrentValues[propertyName];
-                if (oldVal != null && newVal != null && !Equals(oldVal, newVal))
+                
+                //如果原值是null，新值非null，则不会记录！所以只要新旧值不等即可。-2014.05.13
+                //if (oldVal != null && newVal != null && !Equals(oldVal, newVal))
+                if (!Equals(oldVal, newVal))
                 {
                     newData.AppendFormat("{0}={1} || ", propertyName, newVal);
                     oldData.AppendFormat("{0}={1} || ", propertyName, oldVal);
                 }
             }
             if (oldData.Length > 0)
-                oldData = oldData.Remove(oldData.Length - 3, 3);
+                oldData = oldData.Remove(oldData.Length - 3, 3);//{MatDB= || } --> {MatDB= }
             if (newData.Length > 0)
                 newData = newData.Remove(newData.Length - 3, 3);
         }
